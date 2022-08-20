@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Photo;
 use Illuminate\Http\Request;
 
 class PhotoApiController extends Controller
@@ -13,7 +14,7 @@ class PhotoApiController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json(Photo::latest('id')->paginate(10));
     }
 
     /**
@@ -29,7 +30,17 @@ class PhotoApiController extends Controller
             'photos' => 'required',
             "photos.*" => 'required|file|mimes:png,jpg|max:512'
         ]);
-        return $request;
+
+        foreach ($request->photos as $photo) {
+            $pathName = $photo->store('public');
+
+            Photo::create([
+                'product_id' => $request->product_id,
+                'name' => $pathName
+            ]);
+        }
+
+        return response()->json(['message' => "Photos are uploaded."]);
     }
 
     /**
@@ -63,6 +74,12 @@ class PhotoApiController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $photo = Photo::find($id);
+
+        if (!$photo) return response()->json(['message' => "Photo is not found"], 404);
+
+        $photo->delete();
+
+        return  response()->json(['message' => "Photo is deleted"], 204);
     }
 }
