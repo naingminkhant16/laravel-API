@@ -25,12 +25,16 @@ class ApiAuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        if (Auth::attempt($request->only(['email', 'password']))) {
-            $token = Auth::user()->createToken('phone')->plainTextToken;
-            return response()->json($token);
-        }
+        // if (Auth::attempt($request->only(['email', 'password']))) {
+        //     $token = Auth::user()->createToken('phone')->plainTextToken;
+        //     return response()->json($token);
+        // }
 
-        return response()->json(['message' => 'User Not Found'], 403);
+        // return response()->json(['message' => 'User Not Found'], 403);
+        return response()->json([
+            'message' => 'User Successfully Created',
+            'success' => true
+        ], 403);
     }
 
     public function login(Request $request)
@@ -43,24 +47,33 @@ class ApiAuthController extends Controller
         if (Auth::attempt($request->only(['email', 'password']))) {
             $token = Auth::user()->createToken('phone')->plainTextToken;
             return response()->json([
+                'success' => true,
+                'message' => "Login Success",
                 'token' => $token,
                 'auth' => new UserResource(Auth::user())
             ]);
         }
 
-        return response()->json(['message' => 'User Not Found'], 401);
+        return response()->json([
+            'message' => 'User Not Found',
+            'success' => false
+        ], 401);
     }
 
     public function logout()
     {
         Auth::user()->currentAccessToken()->delete();
-        return response()->json(['message' => "Logout Success"], 204);
+        return response()->json(['message' => "Logout Success", 'success' => true], 200);
     }
 
     public function logoutAll()
     {
         Auth::user()->tokens()->delete();
-        return response()->json(['message' => "Logout  All Success"], 204);
+        // return response()->json(['message' => "Logout  All Success"], 204);
+        return response()->json([
+            'message' => "Logout  All Success",
+            'success' => true
+        ]);
     }
 
     public function tokens()

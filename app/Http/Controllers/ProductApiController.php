@@ -30,6 +30,8 @@ class ProductApiController extends Controller
      */
     public function store(Request $request)
     {
+        sleep(5); //make traffic
+
         $request->validate([
             'name' => "required|min:1",
             'price' => "required|min:1|numeric",
@@ -55,7 +57,8 @@ class ProductApiController extends Controller
         $product->photos()->saveMany($toSavePhotos);
 
         return response()->json([
-            'message' => "success",
+            'message' => "Product is created successfully.",
+            'success' => true,
             'product' => new ProductResource($product)
         ]);
     }
