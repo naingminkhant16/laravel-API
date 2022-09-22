@@ -34,7 +34,7 @@ class ProductResource extends JsonResource
             'show_price' => $this->price . " mmk",
             'stock' => $this->stock,
             'stock_status' => $this->stockStatus($this->stock),
-            'data' => $this->created_at->format('d M Y'),
+            'date' => $this->created_at->format('d M Y'),
             'time' => $this->created_at->format('h:i A'),
             // 'owner' => $this->user->name,
             'owner' => new UserResource($this->user),

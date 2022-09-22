@@ -17,7 +17,14 @@ class ProductApiController extends Controller
      */
     public function index()
     {
-        $products = Product::latest('id')->paginate(10);
+        $products = Product::when(
+            request('keyword'),
+            fn ($q, $keyword) => $q->where('name', 'like', "%$keyword%")
+        )
+            ->latest('id')
+            ->paginate(10)
+            ->onEachSide(1)
+            ->withQueryString();
         // return response()->json($products);
         return ProductResource::collection($products);
     }
@@ -30,7 +37,7 @@ class ProductApiController extends Controller
      */
     public function store(Request $request)
     {
-        sleep(5); //make traffic
+        // sleep(5); //make traffic
 
         $request->validate([
             'name' => "required|min:1",
@@ -110,7 +117,12 @@ class ProductApiController extends Controller
         }
         $product->update();
 
-        return response()->json($product);
+        // return response()->json($product);
+        return response()->json([
+            'message' => "Product is Updated",
+            'success' => true,
+            'product' => new ProductResource($product)
+        ]);
     }
 
     /**
@@ -126,6 +138,6 @@ class ProductApiController extends Controller
         if (!$product) return response()->json(['message' => "Product is not found"], 404);
 
         $product->delete();
-        return response()->json(['message' => "Product is deleted"], 204);
+        return response()->json(['message' => "Product is deleted"]);
     }
 }
